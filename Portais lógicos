@@ -1,0 +1,113 @@
+from abc import ABC, abstractmethod
+
+class Portalogica:
+    def __init__(self, ent1 , ent2):
+        self.ent1 = ent1
+        self.ent2 = ent2
+
+    
+class not1(Portalogica):
+    def __init__(self, ent1):
+        super().__init__(ent1)
+    def eval(self, ent1):
+        if isinstance(ent1, str):
+            return f'({ent1})´'
+        else:
+            if ent1 == 1:
+                return 0
+            elif ent1 == 0:
+                return 1
+            else:
+                raise ValueError("Valor deve ser string ou 1|0")
+            
+
+class and1(Portalogica):
+    def __init__(self, ent1, ent2):
+        super().__init__(ent1, ent2)
+    def eval(self, ent1, ent2):
+        if isinstance(ent1, str) and isinstance(ent2, str):
+            return f'`{ent1}{ent2}'
+        elif ent1 == 1 or ent1 == 0 and ent2 == 1 or ent2 == 0:
+            return (ent1*ent2)
+        elif isinstance(ent1, str) and ent2 == 1:
+            return f'{ent1}'
+        elif isinstance(ent2, str) and ent1 == 1:
+            return f'{ent2}'
+        elif isinstance(ent1, str) and ent2 == 0 or isinstance(ent2, str) and ent1 == 0:
+            return 0   
+        elif ent1 == 1  and ent2 == 1:
+            return 1
+
+class or1(Portalogica):
+    def __init__(self, ent1, ent2):
+        super().__init__(ent1, ent2)
+    def eval(self, ent1, ent2):
+        if isinstance(ent1, str) and isinstance(ent2, str):
+            return f'`{ent1}+{ent2}'
+        elif ent1 == 1 and ent2 == 1 or ent1 == 0 and ent2 == 1 or ent1 == 1 and ent2 == 0 or isinstance(ent1, str) and ent2 == 1 or isinstance(ent2, str) and ent1 == 1:
+            resp = 1
+            self.resp = resp
+            return resp
+        elif ent1 == 0 and ent2 == 0:
+            resp = 0
+            self.resp = resp
+            return resp
+        elif isinstance(ent1, str) and ent2 == 0:
+            return f'{ent1}'
+        elif isinstance(ent2, str) and ent1 == 0:
+            return f'{ent2}'
+    def __str__(self):
+        return f'porta logica: OR , entrada 1:{self.ent1} , entrada 2:{self.ent2} , saida:{self.resp} '
+
+
+class xor1(Portalogica):
+    def __init__(self, ent1, ent2):
+        super().__init__(ent1, ent2)
+    def eval(self, ent1, ent2):
+        if not isinstance(ent1, str):
+            for ent1 in [0,1] and ent2 in [0,1]:
+                if ent1 == ent2:
+                    return 1
+                else:
+                    return 0
+        elif isinstance(ent1, str) and isinstance(ent2, str):
+            return f'{ent1}´{ent2}+{ent1}{ent2}´'
+
+
+class nand1(Portalogica):
+    def __init__(self, ent1, ent2):
+        super().__init__(ent1, ent2)
+    def eval(self, ent1, ent2):
+        if isinstance(ent1, str) and isinstance(ent2, str):
+            return f'`({ent1}{ent2})´'
+        elif ent1 == 1 or ent1 == 0 and ent2 == 1 or ent2 == 0:
+            return not(ent1*ent2)
+        elif isinstance(ent1, str) and ent2 == 1:
+            return f'{ent1}´'
+        elif isinstance(ent2, str) and ent1 == 1:
+            return f'{ent2}´'
+        elif isinstance(ent1, str) and ent2 == 0 or isinstance(ent2, str) and ent1 == 0:
+            return 1
+        elif ent1 == 1  and ent2 == 1:
+            return 0
+
+class nor1(Portalogica):
+    def __init__(self, ent1, ent2):
+        super().__init__(ent1, ent2) 
+    def eval(self, ent1, ent2):
+        if isinstance(ent1, str) and isinstance(ent2, str):
+            return f'`{ent1}+{ent2}'
+        elif ent1 == 1 and ent2 == 1 or ent1 == 0 and ent2 == 1 or ent1 == 1 and ent2 == 0 or isinstance(ent1, str) and ent2 == 1 or isinstance(ent2, str) and ent1 == 1:
+            return 0
+        elif ent1 == 0 and ent2 == 0:
+            return 1
+        elif isinstance(ent1, str) and ent2 == 0:
+            return f'{ent1}´'
+        elif isinstance(ent2, str) and ent1 == 0:
+            return f'{ent2}´'
+
+if __name__ == '__main__':
+    banana = or1(1,1)
+    print(banana)
+    banano = or1(0,0)
+    print(banano)
