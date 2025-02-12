@@ -1,0 +1,272 @@
+germinoso
+
+class Client:
+    def __init__(self, name):
+        self.__id = Client.get_next_id()
+        self.__name = name
+
+    @property
+    def id(self):
+        return self.__id
+
+    @property
+    def name(self):
+        return self.__name
+
+    def __str__(self):
+        return f"Client Id: {self.__id} / Client Name: {self.__name}"
+
+    next_id = 1
+
+    @staticmethod
+    def get_next_id():
+        next_id = Client.next_id
+        Client.next_id += 1
+        return next_id
+
+
+class Account:
+    def __init__(self, client_id):
+        self.__id = Account.get_next_id()
+        self.__client_id = client_id
+        self.__balance = 0.0
+        self.__active = False
+
+    @property
+    def id(self):
+        return self.__id
+
+    @property
+    def client_id(self):
+        return self.__client_id
+
+    @property
+    def active(self):
+        return self.__active
+
+    @active.setter
+    def active(self, value):
+        if not isinstance(value, bool):
+            raise TypeError("O estado da conta deve ser um booleano.")
+        self.__active = value
+
+    @property
+    def balance(self):
+        return self.__balance
+
+    def open(self, initial_deposit):
+        if self.__active:
+            raise ValueError("A conta já está aberta.")
+        if not isinstance(initial_deposit, (int, float)) or initial_deposit <= 0:
+            raise ValueError("O depósito inicial deve ser um número maior que zero.")
+        self.__balance = initial_deposit
+        self.__active = True
+
+    def deposit(self, amount):
+        if not self.__active:
+            raise ValueError("A conta deve estar ativa para realizar um depósito.")
+        if not isinstance(amount, (int, float)) or amount <= 0:
+            raise ValueError("O valor do depósito deve ser um número maior que zero.")
+        self.__balance += amount
+
+    def withdraw(self, amount):
+        if not self.__active:
+            raise ValueError("A conta deve estar ativa para realizar um saque.")
+        if not isinstance(amount, (int, float)) or amount <= 0:
+            raise ValueError("O valor do saque deve ser um número maior que zero.")
+        if amount > self.__balance:
+            raise ValueError("Saldo insuficiente para realizar o saque.")
+        self.__balance -= amount
+        return amount
+
+    def transfer(self, other_account, amount):
+        if not self.__active:
+            raise ValueError("A conta deve estar ativa para realizar uma transferência.")
+        if not isinstance(other_account, Account):
+            raise TypeError("A conta de destino deve ser uma instância da classe Account.")
+        if not isinstance(amount, (int, float)) or amount <= 0:
+            raise ValueError("O valor da transferência deve ser um número maior que zero.")
+        if amount > self.__balance:
+            raise ValueError("Saldo insuficiente para realizar a transferência.")
+        self.withdraw(amount)
+        other_account.deposit(amount)
+
+    def close(self):
+        if not self.__active:
+            raise ValueError("A conta já está inativa.")
+        self.__active = False
+        return self.__balance
+
+    def __str__(self):
+        return f"Account: {self.__id} / Client: {self.__client_id} / Balance: {self.__balance:.2f} / Active: {self.__active}"
+
+    next_id = 1
+
+    @staticmethod
+    def get_next_id():
+        next_id = Account.next_id
+        Account.next_id += 1
+        return next_id
+
+
+class BankAgency:
+    def __init__(self, id, name):
+        self.__id = id
+        self.__name = name
+        self.__clients = {}
+        self.__accounts = {}
+
+    @property
+    def id(self):
+        return self.__id
+
+    @property
+    def name(self):
+        return self.__name
+
+    def add_client(self, name):  # Changed to receive only name
+        client = Client(name)
+        if client.id in self.__clients:
+            raise ValueError("Já existe um cliente com esse ID na agência.")
+        self.__clients[client.id] = client
+        return client.id
+
+    def del_client(self, client_id):
+        if client_id not in self.__clients:
+            raise ValueError("Não existe um cliente com esse ID na agência.")
+
+        # Close accounts associated with the client before deleting
+        for account_id in list(self.__accounts.keys()):  # Iterate over a copy
+            account = self.__accounts[account_id]
+            if account.client_id == client_id:
+                self.close_account(account_id)  # Properly close the account
+                del self.__accounts[account_id]
+
+        del self.__clients[client_id]
+
+
+
+    def count_clients(self):
+        return len(self.__clients)
+
+    def list_clients(self):
+        return list(self.__clients.values())
+
+    def add_account(self, client_id):
+        if client_id not in self.__clients:
+            raise ValueError("Não existe um cliente com esse ID na agência. Crie o cliente antes da conta.")
+        account = Account(client_id)
+        self.__accounts[account.id] = account
+        return account.id
+
+    def del_account(self, account_id):
+        if account_id not in self.__accounts:
+            raise ValueError("Não existe uma conta com esse ID na agência.")
+        del self.__accounts[account_id]
+
+    def count_accounts(self):
+        return len(self.__accounts)
+
+    def list_accounts(self):
+        return list(self.__accounts.values())
+
+    def __get_client(self, client_id):
+        if client_id not in self.__clients:
+            raise ValueError("Não existe um cliente com esse ID na agência.")
+        return self.__clients[client_id]
+
+    def __get_account(self, account_id):
+        if account_id not in self.__accounts:
+            raise ValueError("Não existe uma conta com esse ID na agência.")
+        return self.__accounts[account_id]
+
+    def open_account(self, account_id, initial_deposit):
+        account = self.__get_account(account_id)
+        account.open(initial_deposit)
+
+    def balance_account(self, account_id):
+        account = self.__get_account(account_id)
+        return account.balance
+
+    def deposit_account(self, account_id, amount):
+        account = self.__get_account(account_id)
+        account.deposit(amount)
+
+    def withdraw_account(self, account_id, amount):
+        account = self.__get_account(account_id)
+        return account.withdraw(amount)
+
+    def transfer_account(self, from_account_id, to_account_id, amount):
+        from_account = self.__get_account(from_account_id)
+        to_account = self.__get_account(to_account_id)
+        from_account.transfer(to_account, amount)
+
+    def close_account(self, account_id):
+        account = self.__get_account(account_id)
+        return account.close()
+
+    def total_balance(self):
+        total = 0
+        for account in self.__accounts.values():
+            total += account.balance
+        return total
+
+    def __str__(self):
+        return f"Agency: {self.__id} / {self.__name}"
+
+
+
+GPTENIS
+
+
+
+class Account:
+    __baseId = 0  # Class-level variable to generate unique account IDs
+
+    def __init__(self, client_id):
+        # Use Account.__baseId to get the base ID
+        self.__id = Account.__baseId
+        Account.__baseId += 1  # Increment the base ID for the next account
+        self.client_id = client_id  # Store client_id for the account holder
+        self.__balance = 0.0  # Set initial balance to 0.0
+        self.__active = False  # Account is initially inactive
+    
+    def balance(self):
+        return self.__balance  # Return the current balance
+    
+    def open(self, initial_deposit):
+        # Check if the account is already open
+        if self.__active:
+            raise ValueError("A conta já está aberta.")
+        
+        # Validate that the initial deposit is a positive number
+        if not isinstance(initial_deposit, (int, float)) or initial_deposit <= 0:
+            raise ValueError("O depósito inicial deve ser um número maior que zero.")
+        
+        self.__balance = initial_deposit  # Set the initial deposit as the balance
+        self.__active = True  # Mark the account as active
+
+    def close(self):
+        # Method to close the account, setting balance to 0 and marking it inactive
+        if not self.__active:
+            raise ValueError("A conta já está fechada.")
+        self.__balance = 0.0  # Set balance to 0 when closing the account
+        self.__active = False  # Mark the account as inactive
+
+    def deposit(self, amount):
+        # Deposit money into the account
+        if not self.__active:
+            raise ValueError("A conta não está aberta.")
+        if amount <= 0:
+            raise ValueError("O valor do depósito deve ser maior que zero.")
+        self.__balance += amount  # Add amount to balance
+
+    def withdraw(self, amount):
+        # Withdraw money from the account
+        if not self.__active:
+            raise ValueError("A conta não está aberta.")
+        if amount <= 0:
+            raise ValueError("O valor do saque deve ser maior que zero.")
+        if amount > self.__balance:
+            raise ValueError("Saldo insuficiente.")
+        self.__balance -= amount  # Subtract amount from balance
