@@ -1,0 +1,8 @@
+#Considere que voce esta implementando jogos de cartas em qeu tanto um baralho convencional
+#quanto um baralho UNO devem ser suportados
+#Crie uma classe CardSet que armazena uma lista de cartas
+#A classe CardSet deve suportar tanto as cartas de UNO quanto as cartas convencionais
+#Considere que cada carta em um valor, que é um númeor ou uma leta ( 2-10 , A, K,Q,K) e um naipe (O E P C)
+#Considere que cada carta de UNO tem um valor (0 - 9), ou que são cartas especiais(+2,+4, qualquer cor, inverter ,bloquear)
+#A classe CardSet deve ser capz de adicionar e imprimir qualquer conjunto de cartas válido ~
+#Cada carta deve ser capaz de imprimir a si mesma
