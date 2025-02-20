@@ -1,0 +1,12 @@
+#Considere que esta elaborando um sistema que recebe um pedido(classe pedido) de
+#uma lista de itens (classe item). o pedido possui um solicitante (atributo nome)
+#uma data (atributo data,por simplicidade,uma string) e um valor total
+#método valor. Em seu construtor o pedido recebe um nome, e uma lista
+#com uma quantidade indeterminada de items(utilizadndo *args,mas chamando
+#o parametro de *itens).Cada item deve ser veriicado como objeto da classe Item
+#cada item tem uma descrição, um valor e uma lista de observações,
+#passadas utilizando **kwargs(), mas chamando o parametro de *obs), o pedido pode adicionar
+#um ou mais item(metodo adcionar que recebe um parametro *itens). todos
+#os objetos são imprimíveis. Os itens são todos de alimentação e podem ser :
+#Laticinio,Frutas, Vegetais, Carne, Massas.
+#
