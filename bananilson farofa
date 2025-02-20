@@ -1,0 +1,85 @@
+#Considere que esta elaborando um sistema que recebe um pedido(classe pedido) de
+#uma lista de itens (classe item). o pedido possui um solicitante (atributo nome)
+#uma data (atributo data,por simplicidade,uma string) e um valor total
+#método valor. Em seu construtor o pedido recebe um nome, e uma lista
+#com uma quantidade indeterminada de items(utilizadndo *args,mas chamando
+#o parametro de *itens).Cada item deve ser verificado como objeto da classe Item
+#cada item tem uma descrição, um valor,
+#passadas utilizando **kwargs(), mas chamando o parametro de *obs), o pedido pode adicionar
+#um ou mais item(metodo adcionar que recebe um parametro *itens). todos
+#os objetos são imprimíveis. Os itens são todos de alimentação e podem ser :
+#Laticínio,Frutas, Vegetais, Carne, Massas. laticínios e Massas com uma data de validade
+# o pedido com todos os seus itens e p valor total
+
+class Pedido:
+    def __init__(self, nome, data, *itens):
+        self.name = nome
+        self.data = data
+        self.itens = []
+        self.adicionar(*itens)
+    def adicionar(self,*itens):
+        for item in itens:
+            if isinstance(item,Item):
+                self.itens.append(item)
+            else:
+                raise ValueError("tem q ser do msm objetido do Item")
+    def valor(self):
+        total = 0
+        for item in self.itens:
+            total = total + item.valor #tipo pato
+        return total 
+    def __str__(self):
+        res = ''
+        res += f'{Pedido}\n DE: {self.name}\t Em: {self.data}\n'
+        for item in self.itens:
+            res += item.__str__()+'\n'
+        res += f'Total {self.valor}'
+        return res
+class Item:
+    def __init__(self, desc,valor,**obs):
+        self.desc = desc
+        self.value = valor
+        self.obs  = obs
+    def __str__(self):
+        return f'{self.desc}\t{self.value}\n{self.obs}'
+
+class Vegetais(Item):
+    def __init__(self, desc,valor,tipo,**obs):
+        super().__init__(desc , valor, **obs)
+        self.type = tipo
+    def __str__(self):
+        return f'{self.desc} - (type:{self.type})\t{self.value}\n{self.obs}'
+                                             
+class ItemValidade(Item):
+    def __init__(self, desc, valor, validade,**obs):
+        super().__init__(desc , valor, **obs)
+        self.expiredate = validade
+    def __str__(self):
+        return f'{self.desc}-(val:{self.expiredate}) {self.value} {self.obs})'
+
+class Laticinio(ItemValidade):
+    def __init__(self, desc, valor, validade, origem, **obs):
+        super().__init__(desc , valor, validade, **obs)
+        self.origin = origem
+    def __str__(self):
+        return f'{self.desc} -(origem:{self.origim} , val:{self.expiredate})\t{self.value}\n {self.obs})'
+
+class Carnes(ItemValidade):
+    def __init__(self,desc,valor,validade,fonte,**obs):
+        super().__init__(desc , valor, validade, **obs)
+        self.type = fonte
+    def __str__(self):
+        return f'{self.desc}-(tipo:{self.type} , val:{self.expiredate})\t{self.value}\n {self.obs})'
+
+class Massas(ItemValidade):
+    def __init__(self,desc,valor,validade,tipo,**obs):
+        super().__init__(desc , valor, validade, **obs)
+        self.type = tipo
+    def __str__(self):
+        return f'{self.desc}-(tipo:{self.type} , val:{self.expiredate})\t{self.value}\n {self.obs})'
+
+if __name__ == '__main__':
+    v1 = Vegetais(desc='Laranja', tipo='Fruta',valor=10, bananilso =9999, farofa = 'denilson')
+    print(v1)
+    p = Pedido('bananilson','farofa')
+    print(p)
